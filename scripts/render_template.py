@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Render a .pptx template to per-page PNGs.
 
-Backends, in priority order:
-  PPTX -> PDF: native LibreOffice CLI
-  PDF -> PNG:  pymupdf > pdf2image (needs poppler)
+Backends, in priority order (platform-dependent):
+  macOS:   Keynote (AppleScript) > LibreOffice + pymupdf/pdf2image
+  Windows: PowerPoint COM > LibreOffice + pymupdf/pdf2image
+  Linux:   LibreOffice + pymupdf/pdf2image
 
 Default output: <cwd>/template_renders/<pptx_stem>/page-NN.png
-Intermediate PDF goes to <out_dir>/_source.pdf and is left in place
-for inspection (gitignored under template_renders/).
+Intermediate PDF (LibreOffice path only) goes to <out_dir>/_source.pdf
+and is left in place for inspection (gitignored under template_renders/).
 """
 from __future__ import annotations
 
@@ -57,6 +58,12 @@ def render_pptx_to_pngs(
 
     # Windows: try PowerPoint COM first (direct PNG export, no PDF step)
     count = _try_powerpoint_render(pptx_path, out_dir)
+    if count is not None:
+        print(f"[OK] 渲染 {count} 页 -> {out_dir}")
+        return out_dir
+
+    # macOS: try Keynote AppleScript (direct PNG export, no PDF step)
+    count = _try_keynote_render(pptx_path, out_dir)
     if count is not None:
         print(f"[OK] 渲染 {count} 页 -> {out_dir}")
         return out_dir
@@ -156,6 +163,82 @@ def _try_powerpoint_render(pptx_path: Path, out_dir: Path) -> Optional[int]:
             pythoncom.CoUninitialize()
         except Exception:
             pass
+
+
+def _try_keynote_render(pptx_path: Path, out_dir: Path) -> Optional[int]:
+    """macOS only: use Keynote AppleScript to export slides as PNGs.
+
+    Returns page count, or None if unavailable / failed (caller should fall back to LO).
+    """
+    if sys.platform != "darwin":
+        return None
+
+    keynote_app = "/Applications/Keynote.app"
+    if not os.path.isdir(keynote_app):
+        return None
+
+    pptx_path = pptx_path.resolve()
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    dest_prefix = out_dir / "_keynote_export.png"
+
+    script = f'''
+tell application "Keynote"
+    with timeout of 90 seconds
+        try
+            open POSIX file "{pptx_path}"
+            set theDoc to front document
+            set slideCount to count of slides of theDoc
+            export theDoc to POSIX file "{dest_prefix}" as slide images ¬
+                with properties {{image format:PNG, compression factor:1.0}}
+            close theDoc without saving
+            return slideCount
+        on error errMsg number errNum
+            -- Keynote may show a conversion dialog that blocks Apple Events;
+            -- surface the error so Python can fall back to LibreOffice.
+            return "ERR:" & errNum & ":" & errMsg
+        end try
+    end timeout
+end tell
+'''
+
+    print(f"\U0001f5a5\ufe0f  尝试 Keynote 渲染：{pptx_path.name}")
+
+    try:
+        result = subprocess.run(
+            ["osascript", "-e", script],
+            check=True, capture_output=True, text=True, timeout=120,
+        )
+        stdout = result.stdout.strip()
+        if stdout.startswith("ERR:"):
+            print(f"(!) Keynote 失败 ({stdout[4:]})，回退到 LibreOffice")
+            return None
+        slide_count = int(result.stdout.strip())
+    except subprocess.TimeoutExpired:
+        print("(!) Keynote 导出超时，回退到 LibreOffice")
+        return None
+    except (subprocess.CalledProcessError, ValueError) as e:
+        print(f"(!) Keynote 失败 ({e})，回退到 LibreOffice")
+        return None
+
+    # Rename _keynote_export.001.png, _keynote_export.002.png, ... -> page-01.png, ...
+    existing = sorted(out_dir.glob("_keynote_export.*.png"))
+    if len(existing) != slide_count:
+        print(f"(!) Keynote 导出文件数 ({len(existing)}) 与页数 ({slide_count}) 不符，回退到 LibreOffice")
+        # Clean up partial output
+        for f in out_dir.glob("_keynote_export.*.png"):
+            f.unlink(missing_ok=True)
+        return None
+
+    for f in existing:
+        try:
+            page_num = int(f.suffix.lstrip("."))
+        except ValueError:
+            continue
+        f.rename(out_dir / f"page-{page_num:02d}.png")
+
+    print(f"[OK] Keynote 导出 {slide_count} 页 -> {out_dir}")
+    return slide_count
 
 
 def _convert_pptx_to_pdf(pptx_path: Path, out_pdf: Path) -> None:
