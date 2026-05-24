@@ -76,7 +76,7 @@ Summary:
 <details>
 <summary>Developer note: internal editing mechanism diagram</summary>
 
-<img src="assets/architecture_cn.png" width="100%" alt="system architecture">
+<img src="assets/architecture_cn.jpg" width="100%" alt="system architecture">
 
 </details>
 

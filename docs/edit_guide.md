@@ -47,7 +47,7 @@
 
 | 修改前 | 修改后 |
 | --- | --- |
-| <img src="assets/demo1_before.png" width="100%" alt="修改前：产品发布会"> | <img src="assets/demo1_after.png" width="100%" alt="修改后：年度战略复盘"> |
+| <img src="assets/demo1_before.jpg" width="100%" alt="修改前：产品发布会"> | <img src="assets/demo1_after.jpg" width="100%" alt="修改后：年度战略复盘"> |
 
 测评结果：
 
@@ -74,7 +74,7 @@
 
 | 修改前 | 修改后 |
 | --- | --- |
-| <img src="assets/demo2_before.png" width="100%" alt="修改前：2024 年度回顾"> | <img src="assets/demo2_after.png" width="100%" alt="修改后：2025 年度战略发布会"> |
+| <img src="assets/demo2_before.jpg" width="100%" alt="修改前：2024 年度回顾"> | <img src="assets/demo2_after.jpg" width="100%" alt="修改后：2025 年度战略发布会"> |
 
 测评结果：
 
@@ -99,7 +99,7 @@
 
 | 修改前 | 修改后 |
 | --- | --- |
-| <img src="assets/demo3_before.png" width="100%" alt="修改前：带版权文字"> | <img src="assets/demo3_after.png" width="100%" alt="修改后：删除版权文字"> |
+| <img src="assets/demo3_before.jpg" width="100%" alt="修改前：带版权文字"> | <img src="assets/demo3_after.jpg" width="100%" alt="修改后：删除版权文字"> |
 
 测评结果：
 
@@ -128,7 +128,7 @@
 
 | 修改前 | 修改后 |
 | --- | --- |
-| <img src="assets/demo4_data_before.png" width="100%" alt="修改前：三列数据指标"> | <img src="assets/demo4_data_after.png" width="100%" alt="修改后：三列数据指标更新"> |
+| <img src="assets/demo4_data_before.jpg" width="100%" alt="修改前：三列数据指标"> | <img src="assets/demo4_data_after.jpg" width="100%" alt="修改后：三列数据指标更新"> |
 
 测评结果：
 
@@ -156,7 +156,7 @@
 
 | 修改前 | 修改后 |
 | --- | --- |
-| <img src="assets/demo5_logo_before.png" width="100%" alt="修改前：无 logo"> | <img src="assets/demo5_logo_after.png" width="100%" alt="修改后：右上角新增 logo"> |
+| <img src="assets/demo5_logo_before.jpg" width="100%" alt="修改前：无 logo"> | <img src="assets/demo5_logo_after.jpg" width="100%" alt="修改后：右上角新增 logo"> |
 
 测评结果：
 
@@ -178,7 +178,7 @@
 当前结论：可以只更新指定页。下面的多页证据图展示了修改前后只有第 2 页发生变化，第 1 页和第 3 页保持原样。
 
 <p align="center">
-  <img src="assets/demo6_multislide_evidence.png" width="100%" alt="复杂多页只改目标页证据图">
+  <img src="assets/demo6_multislide_evidence.jpg" width="100%" alt="复杂多页只改目标页证据图">
 </p>
 
 | 检查项 | 结果 |
