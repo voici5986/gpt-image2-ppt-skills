@@ -193,9 +193,9 @@ class VisionClient:
         self.api_key = os.getenv("VISION_API_KEY", "")
         self.model = os.getenv("VISION_MODEL_NAME", "gemini-3.1-pro-preview")
         if not self.base_url:
-            raise ValueError("缺少 VISION_BASE_URL（请在 .env 里配置）")
+            raise ValueError("缺少 VISION_BASE_URL（请通过 agent 配置 / 系统环境变量注入）")
         if not self.api_key:
-            raise ValueError("缺少 VISION_API_KEY（请在 .env 里配置）")
+            raise ValueError("缺少 VISION_API_KEY（请通过 agent 配置 / 系统环境变量注入）")
         # 端点 URL：base 已包含 /v1 时不再追加
         if "/chat/completions" in self.base_url:
             self.endpoint = self.base_url

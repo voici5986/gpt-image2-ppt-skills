@@ -4,7 +4,7 @@
 
 **Generate visually striking PPT decks with OpenAI `gpt-image-2` in one shot.**
 
-A Claude Code / OpenClaw Skill. Once installed in your agent, a single natural-language prompt yields 16:9 high-res images + a keyboard-navigable HTML viewer + a ready-to-send `.pptx` — or clones any reference `.pptx` template and reskins it with new content.
+A Claude Code / Codex / OpenClaw Skill. Once installed in your agent, a single natural-language prompt yields 16:9 high-res images + a ready-to-send `.pptx` — or clones any reference `.pptx` template and reskins it with new content.
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](../LICENSE)
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/)
@@ -39,11 +39,46 @@ A Claude Code / OpenClaw Skill. Once installed in your agent, a single natural-l
 ## ✨ What it does
 
 - 🎨 **10 curated styles** — Spatial Glass / Tech Blue / Editorial Mono / Dark Aurora / Risograph / Wabi / Swiss Grid / Hand Sketch / Y2K Chrome / Vector Illustration, each with `cover` / `content` / `data` composition rules
-- 🪄 **Template-clone mode** — drop in any `.pptx` and the skill auto-renders it, asks a vision model to extract style + JSON Schema, then reproduces the layout with your new content (like the demo above)
-- 🎮 **HTML viewer + `.pptx`, both shipped** — arrow-key navigation / space to autoplay / ESC fullscreen / swipe on touch, plus a 16:9 `.pptx` you can send as-is
+- 🪄 **Template-clone mode** — drop in any `.pptx`; the agent follows its layout, palette, and illustration language, then swaps in your new content
+- 🎯 **Natural-language slide edits** — say "change slide 3's subtitle", "remove the footer", or "replace these three metrics", and the agent regenerates only the target slide
+- 🎮 **Dual output** — high-res PNG per slide + 16:9 `.pptx` ready to use
 - ⚡ **10-way concurrency by default** — a 10-page deck finishes in ~30s
-- 🔁 **Two backends** — `openai` direct (needs key) or `codex` CLI (reuses your codex login, no key configured in this skill)
-- 🤖 **Official OpenAI Images API** — model `gpt-image-2`; `base_url` can point at any OpenAI-compatible relay
+- 🧪 **Preview one slide first** — approve the cover before generating the full deck
+- 🧾 **Trackable edits** — changed slides and generated versions can be traced and rolled back
+
+## ✅ Best-fit use cases
+
+| Use case | Fit | Notes |
+| --- | --- | --- |
+| Generate a new deck from a topic | Strong | Good for reports, pitches, training, courses, product intros. |
+| Create a new deck from a company template | Strong | Provide a `.pptx`, approve one cover first, then run the full deck. |
+| Edit titles, subtitles, dates, footers | Strong | The most stable editing scenario. |
+| Update metric cards and key numbers | Good | Works, but every number must be checked before delivery. |
+| Modify only one slide in a multi-slide deck | Good | The target slide is regenerated; other slides are left alone. |
+| Dense tables, financial reports, legal long copy | Weak | Small text and numbers need strict human review. |
+
+## 🧪 Editing Capability Report
+
+If you care about "how reliable are edits in real scenes", see the user-facing case report:
+
+- **[`docs/edit_guide.md`](./edit_guide.md)** — title replacement, date edits, footer removal, metric updates, logo insertion, single-slide edits in a multi-slide deck, current limitations, and a delivery checklist
+
+Summary:
+
+| Capability | Current behavior |
+| --- | --- |
+| Short text edits | Stable for everyday delivery. |
+| Multiple explicit edits | Works best when the user clearly says what should stay unchanged. |
+| Metric slides | Works, but numbers must be checked. |
+| Small icon / logo insertion | Works for style-matched icons; real brand logos need source assets. |
+| Native PowerPoint object editing | Not supported; output PPTX uses full-slide images. |
+
+<details>
+<summary>Developer note: internal editing mechanism diagram</summary>
+
+<img src="assets/architecture_cn.png" width="100%" alt="system architecture">
+
+</details>
 
 ## 🎨 The 10 built-in styles
 
@@ -77,29 +112,42 @@ Please install gpt-image2-ppt-skills for me:
 https://raw.githubusercontent.com/JuneYaooo/gpt-image2-ppt-skills/main/docs/install.md
 ```
 
-The agent will clone the repo, run the install script, ask you for an API key, and tell you to restart.
+The agent will clone the repo, run the install script, ask for an API key only when direct API mode is needed, and tell you to restart.
 
 ### Option 2: manual install
 
 ```bash
 git clone git@github.com:JuneYaooo/gpt-image2-ppt-skills.git
 cd gpt-image2-ppt-skills
-bash install_as_skill.sh
+bash install_as_skill.sh --target claude   # Claude Code
+# or
+bash install_as_skill.sh --target codex    # Codex
 ```
 
-The script installs the skill to `~/.claude/skills/gpt-image2-ppt-skills/`; Claude Code picks it up after restart.
+The script installs the skill into the selected agent directory:
 
-Then drop in one key and you're ready:
+- Claude Code: `~/.claude/skills/gpt-image2-ppt-skills/`
+- Codex: `~/.codex/skills/gpt-image2-ppt-skills/`
+
+If you use direct API mode, inject environment variables through your agent
+framework instead of writing secrets into the caller project's root `.env`:
+
+- Claude Code: user-level `~/.claude/settings.json`, or project-level `.claude/settings.local.json`
+- OpenClaw / custom agents: reference system env vars from `apiKey` / env config
+- CI / servers: system env vars, Docker Compose, Kubernetes Secrets, or CI Secrets
+- Standalone CLI: set `GPT_IMAGE2_PPT_ENV=/path/to/private.env`, or use the skill install directory `.env` as a fallback
 
 ```bash
-# ~/.claude/skills/gpt-image2-ppt-skills/.env
+# Variable names:
 OPENAI_BASE_URL=https://api.openai.com    # or any OpenAI-compatible relay
 OPENAI_API_KEY=sk-...                     # required
 GPT_IMAGE_MODEL_NAME=gpt-image-2
 GPT_IMAGE_QUALITY=high                    # low / medium / high / auto
 ```
 
-> 🔒 **Won't accidentally eat your secrets**: only loads `.env` from the skill's own directory or an explicit `GPT_IMAGE2_PPT_ENV` path. It does **not** walk up into project directories.
+> In **Codex**, if the current agent has native image generation, use the native path in `SKILL.md` and skip `OPENAI_API_KEY`.
+>
+> 🔒 **Won't accidentally eat your secrets**: the script only reads the current process env, platform-injected variables, an explicit `GPT_IMAGE2_PPT_ENV`, and the skill install directory `.env` fallback. It does **not** walk up into caller project directories.
 >
 > 🪄 Template-clone mode additionally needs native `libreoffice` (to render `.pptx` → PNG).
 
@@ -115,15 +163,23 @@ Template clone, same shape:
 
 > I have a `company-template.pptx` — make a 5-slide deck about **[your topic]** using that template.
 
-Claude will write the `slides_plan`, generate a cover first for you to approve, then run the full deck and hand back the HTML viewer + `.pptx` paths.
+Claude will write the `slides_plan`, generate a cover first for you to approve, then run the full deck and hand back the `.pptx` path.
 
-> 🧑‍💻 Prefer to call the CLI yourself instead of going through an agent? See [`SKILL.md`](../SKILL.md) — CLI flags and file layout live there.
+> Prefer to call the CLI yourself instead of going through an agent? See [`SKILL.md`](../SKILL.md) — CLI flags and file layout live there.
+
+---
+
+## 📚 More Docs
+
+- **[`docs/edit_guide.md`](./edit_guide.md)** — user-facing editing capability report, cases, summary, limitations, and delivery checklist
+- **[`docs/workflow.md`](./workflow.md)** — developer documentation for CLI dispatch, generation / edit / rollback / ingest flows, version history, and data safety
+- **[`SKILL.md`](../SKILL.md)** — agent execution spec for generation, template clone, Codex native path, editing workflow, and command references
 
 ---
 
 ## 🙏 Acknowledgements
 
-- [op7418/NanoBanana-PPT-Skills](https://github.com/op7418/NanoBanana-PPT-Skills) — original author of the style prompts and viewer template. This project swaps the image backend from Nano Banana Pro to OpenAI gpt-image-2, rewrites the 3 inherited styles and adds 7 new ones (10 total), and layers on template-clone mode (vision-based style extraction from any user `.pptx`), an md-first authoring flow, automatic `.pptx` packaging, and a codex CLI fallback backend.
+- [op7418/NanoBanana-PPT-Skills](https://github.com/op7418/NanoBanana-PPT-Skills) — reference for the original style prompts and early skill structure. This project swaps the image backend from Nano Banana Pro to OpenAI gpt-image-2, rewrites the 3 inherited styles and adds 7 new ones (10 total), and layers on template-clone mode (vision-based style extraction from any user `.pptx`), an md-first authoring flow, automatic `.pptx` packaging, and a codex CLI fallback backend.
 - [lewislulu/html-ppt-skill](https://github.com/lewislulu/html-ppt-skill) — reference for the Claude Code skill `SKILL.md` frontmatter.
 
 ## License

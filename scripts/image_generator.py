@@ -20,9 +20,8 @@ from typing import Any, Dict, Optional
 
 import requests
 
-# .env 加载由顶层入口（generate_ppt.py 的 find_and_load_env）统一负责。
-# 本模块不调 load_dotenv()，避免 import 时无意识加载父目录 / cwd 的 .env，
-# 与 SKILL.md 声明的"scoped .env loading"保持一致。
+# 环境变量加载由顶层入口 generate_ppt.py 统一负责。
+# 本模块不调 load_dotenv()，避免 import 时无意识加载父目录 / cwd 的 .env。
 
 
 # 16:9 横版用 1536x864，竖版 9:16 用 864x1536，方图用 1024x1024
@@ -85,7 +84,10 @@ class GptImage2Generator:
         self.endpoint = os.getenv("GPT_IMAGE_ENDPOINT", "auto").lower()
 
         if not self.api_key:
-            raise ValueError("缺少 OPENAI_API_KEY，请在 .env 中配置")
+            raise ValueError(
+                "缺少 OPENAI_API_KEY。请通过 agent 配置 / 系统环境变量注入，"
+                "或设置 GPT_IMAGE2_PPT_ENV 指向私有 env 文件。"
+            )
 
         self.aspect_ratio = aspect_ratio
         self.default_size = ASPECT_TO_SIZE.get(aspect_ratio, "1536x1024")
@@ -223,13 +225,29 @@ class GptImage2Generator:
             with open(reference_image_path, "rb") as f:
                 ref_b64 = base64.b64encode(f.read()).decode("ascii")
             ref_data_url = f"data:image/png;base64,{ref_b64}"
-            user_content: Any = [
-                {"type": "image_url", "image_url": {"url": ref_data_url}},
-                {"type": "text", "text": (
+
+            # 判断是编辑模式还是模板克隆模式
+            # 编辑模式的 prompt 含「只修改」「保持其他不变」等语义
+            is_edit = any(kw in prompt for kw in [
+                "只修改", "在参考图基础上", "保持其他所有", "不要动",
+                "请基于上面这张参考图", "只改", "其他完全不变", "其他都不要动",
+            ])
+
+            if is_edit:
+                instruction = (
+                    "请基于上面这张幻灯片图，严格按以下修改要求生成新图片。\n"
+                    "只修改要求提到的部分，其他所有内容（背景、配色、字体、装饰、布局、位置）"
+                    "必须与参考图完全一致。\n\n"
+                )
+            else:
+                instruction = (
                     "请以上面这张图作为视觉风格参考（配色 / 字体 / 装饰元素 / 布局氛围），"
                     "按下方新内容生成一张全新的 PPT 页，不要复制原图的文字内容。\n\n"
-                    + full_prompt
-                )},
+                )
+
+            user_content: Any = [
+                {"type": "image_url", "image_url": {"url": ref_data_url}},
+                {"type": "text", "text": instruction + full_prompt},
             ]
         else:
             user_content = full_prompt
