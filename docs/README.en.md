@@ -10,6 +10,7 @@ A Claude Code / Codex / OpenClaw Skill. Once installed in your agent, a single n
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-orange.svg)](https://www.anthropic.com/claude-code)
 [![gpt-image-2](https://img.shields.io/badge/OpenAI-gpt--image--2-black.svg)](https://platform.openai.com/docs/guides/images)
+[![GitHub stars](https://img.shields.io/github/stars/JuneYaooo/gpt-image2-ppt-skills?style=flat)](https://github.com/JuneYaooo/gpt-image2-ppt-skills/stargazers)
 
 🌐 **中文** → [../README.md](../README.md)
 
@@ -57,6 +58,27 @@ A Claude Code / Codex / OpenClaw Skill. Once installed in your agent, a single n
 | Modify only one slide in a multi-slide deck | Good | The target slide is regenerated; other slides are left alone. |
 | Dense tables, financial reports, legal long copy | Weak | Small text and numbers need strict human review. |
 
+## 🎨 The 10 built-in styles
+
+> Below: the 10 styles each generating one cover under the same topic — "**How to make a PPT with gpt-image-2**". All covers are raw `gpt-image-2` output, no PS.
+
+![10 styles · same topic, raw gpt-image-2 output](assets/style-gallery.jpg)
+
+| Style ID | One-liner | Use cases |
+| --- | --- | --- |
+| `gradient-glass` | Apple Vision OS / Spatial Glass | AI product launches, technical talks, creative pitches |
+| `clean-tech-blue` | Stripe / Linear-grade blue & white | Investor decks, business plans, corporate strategy |
+| `vector-illustration` | Retro vector + black outlines | Education, brand storytelling, community sharing |
+| `editorial-mono` | Kinfolk / Monocle editorial | Brand reveals, cultural interviews, book talks |
+| `dark-aurora` | Linear / Vercel dark neon | AI products, dev tools, technical talks |
+| `risograph` | Riso 2-spot-color print + halftone | Creative studios, indie zines, design agencies |
+| `japanese-wabi` | Muji / Hara Kenya wabi-sabi | Tea ceremony, lifestyle, luxury, cultural lectures |
+| `swiss-grid` | Bauhaus / Vignelli international grid | Academic reports, museum exhibits, serious dashboards |
+| `hand-sketch` | Sketchnote / whiteboard | Workshops, product brainstorming, training |
+| `y2k-chrome` | Y2K liquid chrome + butterfly stickers | Streetwear, entertainment, brand collabs, Gen-Z marketing |
+
+---
+
 ## 🧪 Editing Capability Report
 
 If you care about "how reliable are edits in real scenes", see the user-facing case report:
@@ -79,25 +101,6 @@ Summary:
 <img src="assets/architecture_cn.jpg" width="100%" alt="system architecture">
 
 </details>
-
-## 🎨 The 10 built-in styles
-
-> Below: the 10 styles each generating one cover under the same topic — "**How to make a PPT with gpt-image-2**". All covers are raw `gpt-image-2` output, no PS.
-
-![10 styles · same topic, raw gpt-image-2 output](assets/style-gallery.jpg)
-
-| Style ID | One-liner | Use cases |
-| --- | --- | --- |
-| `gradient-glass` | Apple Vision OS / Spatial Glass | AI product launches, technical talks, creative pitches |
-| `clean-tech-blue` | Stripe / Linear-grade blue & white | Investor decks, business plans, corporate strategy |
-| `vector-illustration` | Retro vector + black outlines | Education, brand storytelling, community sharing |
-| `editorial-mono` | Kinfolk / Monocle editorial | Brand reveals, cultural interviews, book talks |
-| `dark-aurora` | Linear / Vercel dark neon | AI products, dev tools, technical talks |
-| `risograph` | Riso 2-spot-color print + halftone | Creative studios, indie zines, design agencies |
-| `japanese-wabi` | Muji / Hara Kenya wabi-sabi | Tea ceremony, lifestyle, luxury, cultural lectures |
-| `swiss-grid` | Bauhaus / Vignelli international grid | Academic reports, museum exhibits, serious dashboards |
-| `hand-sketch` | Sketchnote / whiteboard | Workshops, product brainstorming, training |
-| `y2k-chrome` | Y2K liquid chrome + butterfly stickers | Streetwear, entertainment, brand collabs, Gen-Z marketing |
 
 ---
 
@@ -151,6 +154,21 @@ GPT_IMAGE_QUALITY=high                    # low / medium / high / auto
 >
 > 🪄 Template-clone mode additionally needs native `libreoffice` (to render `.pptx` → PNG).
 
+### Vision analysis for template clone (optional)
+
+In template-clone mode, the skill needs to "see" your `.pptx` template's visual style first. **If your AI assistant is already multimodal** (Claude Code with Claude Opus/Sonnet, Codex with GPT multimodal, etc.), the agent will analyze the visual style directly and generate a `template_profile.json` with `reference_image` to pass to the CLI with `--template-profile`. **No extra configuration needed.**
+
+Only when your agent uses a text-only model (e.g., DeepSeek text model), you'll need the following env vars to use a separate multimodal model for template analysis:
+
+```bash
+# Optional: vision analysis for template clone (only needed by text-only agents; skip for multimodal agents)
+VISION_BASE_URL=https://your-openai-compatible-relay.example.com/v1
+VISION_API_KEY=sk-...
+VISION_MODEL_NAME=gemini-3.1-pro-preview   # or gpt-4o / claude-3.5-sonnet, any multimodal SKU
+```
+
+> Supports any multimodal model compatible with the OpenAI `/v1/chat/completions` format (Gemini / GPT-4o / Claude, etc.). Fully decoupled from `gpt-image-2` — switching the vision provider won't affect image generation.
+
 ---
 
 ## 🛠 How to use inside Claude Code
@@ -169,18 +187,20 @@ Claude will write the `slides_plan`, generate a cover first for you to approve, 
 
 ---
 
-## 📚 More Docs
-
-- **[`docs/edit_guide.md`](./edit_guide.md)** — user-facing editing capability report, cases, summary, limitations, and delivery checklist
-- **[`docs/workflow.md`](./workflow.md)** — developer documentation for CLI dispatch, generation / edit / rollback / ingest flows, version history, and data safety
-- **[`SKILL.md`](../SKILL.md)** — agent execution spec for generation, template clone, Codex native path, editing workflow, and command references
-
----
-
 ## 🙏 Acknowledgements
 
 - [op7418/NanoBanana-PPT-Skills](https://github.com/op7418/NanoBanana-PPT-Skills) — reference for the original style prompts and early skill structure. This project swaps the image backend from Nano Banana Pro to OpenAI gpt-image-2, rewrites the 3 inherited styles and adds 7 new ones (10 total), and layers on template-clone mode (vision-based style extraction from any user `.pptx`), an md-first authoring flow, automatic `.pptx` packaging, and a codex CLI fallback backend.
 - [lewislulu/html-ppt-skill](https://github.com/lewislulu/html-ppt-skill) — reference for the Claude Code skill `SKILL.md` frontmatter.
+
+## 💬 Community
+
+[**LINUX DO — Chinese Developer Community**](https://linux.do/)
+
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=JuneYaooo/gpt-image2-ppt-skills&type=Date)](https://star-history.com/#JuneYaooo/gpt-image2-ppt-skills&Date)
+
+---
 
 ## License
 
