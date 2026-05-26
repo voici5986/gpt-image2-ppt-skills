@@ -1,13 +1,13 @@
 ---
 name: gpt-image2-ppt
-description: Generate visually striking PPT slides via OpenAI's gpt-image-2 -- 10 curated styles (Spatial Glass / Tech Blue / Editorial Mono / Dark Aurora / Risograph / Wabi / Swiss Grid / Hand Sketch / Y2K Chrome / Retro Vector) plus a template-clone mode that mimics any user-supplied .pptx; outputs high-res slide PNGs and a 16:9 .pptx. Use when the user asks to make a presentation, slides, deck, pitch deck, investor PPT, magazine-style PPT, or 做一份 PPT / 生成幻灯片 / 用 gpt-image 生成 PPT / 按这个模板生成 PPT.
+description: Generate visually striking PPT slides via OpenAI's gpt-image-2 -- use any style in styles/<id>.md or mimic a user-supplied .pptx template; outputs high-res slide PNGs and a 16:9 .pptx. Use when the user asks to make a presentation, slides, deck, pitch deck, investor PPT, magazine-style PPT, or 做一份 PPT / 生成幻灯片 / 用 gpt-image 生成 PPT / 按这个模板生成 PPT.
 ---
 
 # gpt-image2-ppt -- 用 gpt-image-2 生成 PPT
 
 把一份 markdown 大纲（或 `slides_plan.json`）+ 一种视觉风格，直接喂给 OpenAI 官方 Images API（`gpt-image-2`），逐页出图，最后打包成 16:9 .pptx。
 
-## 十种内置风格
+## 可用风格
 
 | 风格 ID | 一句话定位 | 适用场景 |
 | --- | --- | --- |
@@ -21,8 +21,32 @@ description: Generate visually striking PPT slides via OpenAI's gpt-image-2 -- 1
 | `swiss-grid` | Bauhaus / Vignelli 国际主义网格 | 学术报告、博物馆展陈、严肃汇报 |
 | `hand-sketch` | Sketchnote / 白板手绘 | 工作坊、产品 brainstorming、培训 |
 | `y2k-chrome` | Y2K 千禧液态金属 + 蝴蝶贴纸 | 潮牌、文娱、品牌联名、Z 世代营销 |
+| `abstract-art-showcase` | 黑白极简、艺术展览感、超大字体和抽象画面并置 | 艺术策展、作品集、品牌调性展示 |
+| `coal-industry-business-company-profile` | 工业棕黑、粗重标题、结构线和硬朗图标 | 能源、制造业、重资产公司介绍 |
+| `college-candy-aesthetics-infographics` | 糖果色、校园感、圆润信息图和轻快装饰 | 教育、校园活动、轻量数据科普 |
+| `creative-agency` | 创意机构气质、强视觉拼贴、鲜明版式节奏 | Agency 提案、品牌方案、创意汇报 |
+| `culinary-innovation` | 餐饮创新感、食材摄影、暖色块和杂志式排版 | 餐饮品牌、食品创新、菜单/新品发布 |
+| `data-science-consulting` | 数据咨询蓝灰、模块化布局、图表和技术感信息层级 | 数据分析、AI 咨询、企业数字化 |
+| `mindfulness-in-the-classroom-breathing-techniques` | 柔和心理健康配色、留白、圆角块和安静插画感 | 心理健康、课堂活动、呼吸训练课程 |
+| `mind-maps-workshop-professional` | 专业工作坊风、思维导图节点、清晰流程结构 | 培训工作坊、方法论、团队共创 |
+| `meeting-agenda` | 会议议程感、干净网格、强信息分组和商务标题 | 例会、项目同步、管理层汇报 |
+| `investment-company-business-plan` | 投资机构质感、深浅对比、稳重商务版式 | 投资计划、基金介绍、商业计划书 |
+| `indigenous-cultures` | 文化纹样、自然色、手工质感和叙事型构图 | 文化课程、历史主题、公益教育 |
+| `health-disparities-and-social-determinants-of-health-doctor-of-philosophy-phd-in-health-behavior-and-health-education` | 公共健康学术风、理性网格、柔和医疗色和论文感层级 | 医学论文答辩、公共健康报告、教育研究 |
+| `geometric-duotone-thesis` | 双色几何、论文答辩感、斜切图形和强标题 | 学术答辩、研究报告、章节型内容 |
+| `geometric-clinical-case` | 几何医疗风、冷静配色、病例卡片和清晰分栏 | 临床病例、医疗培训、诊疗汇报 |
+| `geometric-business` | 商务几何块、稳健蓝绿调、简洁图表语言 | 商业计划、团队汇报、产品策略 |
+| `formal-lavender-portfolio` | 淡紫正式感、作品集留白、优雅细线和柔和版式 | 个人作品集、设计简历、专业展示 |
+| `flowery` | 花卉装饰、柔和色块、浪漫但有秩序的排版 | 生活方式、女性品牌、活动介绍 |
+| `first-impressions` | 第一印象主题、强封面视觉、人物/标题的戏剧化关系 | 面试培训、个人品牌、沟通课程 |
+| `final-year-project-thesis-defense` | 毕业设计答辩、学院派网格、清晰章节与数据页 | 毕业答辩、项目结题、研究展示 |
+| `fashion-business-consulting-toolkit-aesthetic` | 时尚咨询感、高级拼贴、杂志排版和中性色 | 时尚商业、品牌咨询、趋势报告 |
+| `economic-impact-of-coronavirus` | 经济影响报告风、严肃信息图、冷静色彩和数据叙事 | 宏观经济、政策分析、风险报告 |
+| `eco-green-business-plan` | 鼠尾草绿、自然材质摄影、环保商务与极简分屏 | 可持续商业、环保品牌、健康生活方式 |
 
-> 风格选择原则：技术类首选 `dark-aurora` / `gradient-glass`，商务类首选 `clean-tech-blue` / `editorial-mono`，文化生活类首选 `japanese-wabi` / `vector-illustration`，潮文娱类首选 `risograph` / `y2k-chrome`，学术类首选 `swiss-grid`，工作坊与早期创意类首选 `hand-sketch`。
+所有可用风格都统一放在 `styles/` 下，使用方式完全相同。需要查看风格封面展示时，读取 `docs/distilled-styles.md`。
+
+> 风格选择原则：先根据内容场景在 `styles/` 里选择最贴近的一套。技术类可优先看 `dark-aurora` / `gradient-glass` / `data-science-consulting`，商务类可优先看 `clean-tech-blue` / `editorial-mono` / `eco-green-business-plan` / `investment-company-business-plan`，文化生活类可优先看 `japanese-wabi` / `vector-illustration` / `culinary-innovation` / `flowery`，学术类可优先看 `swiss-grid` / `geometric-duotone-thesis` / `final-year-project-thesis-defense`，工作坊与培训类可优先看 `hand-sketch` / `mind-maps-workshop-professional` / `mindfulness-in-the-classroom-breathing-techniques`。
 
 ## 模板克隆模式
 
@@ -258,7 +282,7 @@ GPT_IMAGE_BACKEND=codex              # 不想每次敲 --backend 就设这个
 
 模板克隆的 vision 分析同理——当 caller agent 自己是多模态时（Claude Code / 多模态 codex），可以直接 `Read` 模板 PNG 抽取风格，不用配 `VISION_*`；只有 caller agent 是纯文本模型时才需要外挂 vision provider。
 
-## 生成流程（内置风格）
+## 生成流程（指定风格）
 
 **先 md 后 json**：md 给人看、方便 diff / review / 改文案；json 由 md 派生，喂给 `generate_ppt.py`，标为 generated，不手改。
 
@@ -288,7 +312,7 @@ GPT_IMAGE_BACKEND=codex              # 不想每次敲 --backend 就设这个
    ```bash
    python3 scripts/md_to_plan.py slides_plan.md -o slides_plan.json
    ```
-4. 选风格：从上面 10 套里挑一个，对应 `styles/<id>.md`
+4. 选风格：从 `styles/` 里挑一个，对应 `styles/<id>.md`；需要视觉预览时先看 `docs/distilled-styles.md`
 5. **构造 slide_spec**（Agent 步骤）：读 `styles/<id>.md` 的视觉规范，为 `slides_plan.json` 每页构造 `slide_spec`（每个元素的 type、content、position、style），写入每页的 `slide_spec` 字段。格式见下方"指哪改哪"章节
 6. 调脚本：
    ```bash
@@ -304,7 +328,7 @@ GPT_IMAGE_BACKEND=codex              # 不想每次敲 --backend 就设这个
 
 1. **拿到模板 .pptx**（用户提供 / 内部模板库 / 网络下载）
 2. **（可选）先单独渲染并人工挑选**----大模板（>15 页）建议先 `python3 scripts/render_template.py xxx.pptx`，再从 `template_renders/<stem>/` 里挑 8-12 张代表页复制到 `template_renders/<stem>_curated/`，供 vision 分析。页数越精，layout 命中越准
-3. **生成 slides_plan.md → 转 slides_plan.json**（见内置风格流程第 2-3 步）。每页 `slide_number` / `page_type` (`cover` / `content` / `data` / 等) / `content`；想精准对位时在 h2 里加 `layout=layout-NN`（NN = 模板第 N 页 / 你期望对应的模板页编号）
+3. **生成 slides_plan.md → 转 slides_plan.json**（见指定风格流程第 2-3 步）。每页 `slide_number` / `page_type` (`cover` / `content` / `data` / 等) / `content`；想精准对位时在 h2 里加 `layout=layout-NN`（NN = 模板第 N 页 / 你期望对应的模板页编号）
 4. **跑 generate_ppt.py**：
    ```bash
    python3 scripts/generate_ppt.py \
@@ -348,7 +372,7 @@ Agent 在搭 plan 时的执行策略：
 
 1. **先问三件事**（不要直接动手）：
    - 内容 / 页数 / 观众是谁？
-   - 风格偏好？按"十种内置风格"表的场景类目映射推荐 1-2 个；**或者用户上传自己的 .pptx 模板**（走 `--template-pptx`，自动渲染）
+   - 风格偏好？按 `styles/` 和 `docs/distilled-styles.md` 的场景类目映射推荐 1-2 个；**或者用户上传自己的 .pptx 模板**（走 `--template-pptx`，自动渲染）
    - 是否需要单页测试一张图先看效果（`--slides 1`）
 2. **先写 slides_plan.md** 给用户确认文案（md 是 source of truth，人审阅友好）
 3. **转 slides_plan.json**：`python3 scripts/md_to_plan.py slides_plan.md -o slides_plan.json`（json 标为 generated，不手改；要改文案回到 md 改再转）
@@ -460,7 +484,7 @@ gpt-image2-ppt-skills/
 |   |---- image_generator.py      # gpt-image-2 wrapper（支持 reference image，openai backend）
 |   |---- codex_backend.py        # 可选：走 codex CLI 出图（--backend codex）
 |   \---- template_analyzer.py    # PPT 模板剖析器（vision + 缓存）
-|---- styles/                 # 10 套内置风格
+|---- styles/                 # 所有可用风格，每个 .md 对应一个 style id
 |   |---- gradient-glass.md           dark-aurora.md
 |   |---- clean-tech-blue.md          risograph.md
 |   |---- vector-illustration.md      japanese-wabi.md

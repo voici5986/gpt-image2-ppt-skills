@@ -39,7 +39,7 @@ A Claude Code / Codex / OpenClaw Skill. Once installed in your agent, a single n
 
 ## ✨ What it does
 
-- 🎨 **10 curated styles** — Spatial Glass / Tech Blue / Editorial Mono / Dark Aurora / Risograph / Wabi / Swiss Grid / Hand Sketch / Y2K Chrome / Vector Illustration, each with `cover` / `content` / `data` composition rules
+- 🎨 **10 curated styles + a distilled style library** — built-ins include Spatial Glass / Tech Blue / Editorial Mono / Dark Aurora / Risograph / Wabi / Swiss Grid / Hand Sketch / Y2K Chrome / Vector Illustration; 22 additional reusable styles were distilled and selected from 500+ online PPT template candidates
 - 🪄 **Template-clone mode** — drop in any `.pptx`; the agent follows its layout, palette, and illustration language, then swaps in your new content
 - 🎯 **Natural-language slide edits** — say "change slide 3's subtitle", "remove the footer", or "replace these three metrics", and the agent regenerates only the target slide
 - 🎮 **Dual output** — high-res PNG per slide + 16:9 `.pptx` ready to use
@@ -76,6 +76,12 @@ A Claude Code / Codex / OpenClaw Skill. Once installed in your agent, a single n
 | `swiss-grid` | Bauhaus / Vignelli international grid | Academic reports, museum exhibits, serious dashboards |
 | `hand-sketch` | Sketchnote / whiteboard | Workshops, product brainstorming, training |
 | `y2k-chrome` | Y2K liquid chrome + butterfly stickers | Streetwear, entertainment, brand collabs, Gen-Z marketing |
+
+## 🧬 Distilled style library: 22 styles from 500+ PPT candidates
+
+We added a web-template distillation workflow: public online preview images are scored for visual quality and reusability, abstract style rules are extracted with a multimodal model, and each accepted style is validated by generating a fresh `gpt-image-2` cover. The current library contains 22 selected styles, and distillation is ongoing. Good template/style references are welcome.
+
+See the full style table, thumbnails, style IDs, visual traits, and use cases in [`distilled-styles.md`](./distilled-styles.md).
 
 ---
 
